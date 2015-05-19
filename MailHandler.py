@@ -24,6 +24,8 @@ elif "auto.submitted.run" in destination:
     log.write("Submitted run at %s\n"%datetime.date.today())
     os.system(PUBLISH)
     os.system(EVA_PUBLISH)
+elif "auto.newsfeed" in destination:
+    log.write("News item %s at %s\n"%(message["Subject"], datetime.date.today()))
 else:
     log.write("Unrecognized destination '%s' at %s\n"%(destination, datetime.date.today()))
 log.close()
