@@ -37,7 +37,7 @@ elif "auto.submitted.run" in destination:
 elif "auto.newsfeed" in destination:
     log.write("News item %s at %s\n"%(message["Subject"], datetime.date.today()))
     # !! Make score configurable in subject
-    upload("%s,\"%s\",%d\n"%(datetime.date.today(), message["Subject"], 50))
+    upload("NEWS,%s,%s,%d\n"%(datetime.date.today(), message["Subject"], 50))
 else:
     log.write("Unrecognized destination '%s' at %s\n"%(destination, datetime.date.today()))
 log.close()
