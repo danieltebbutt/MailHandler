@@ -8,9 +8,9 @@ import boto
 from boto.s3.key import Key
 
 LOG_FILE="/home/ubuntu/MailHandler/log.txt"
-PUBLISH="sh /home/ubuntu/Training/publish.sh > /home/ubuntu/MailHandler/detail.txt 2>&1"
+PUBLISH="sh /home/ubuntu/Training/publish.sh >> /home/ubuntu/MailHandler/detail.txt 2>&1"
 EVA_PUBLISH="sh /home/ubuntu/Training/eva_publish.sh >> /home/ubuntu/MailHandler/detail.txt 2>&1"
-PUBLISH_NEWS "python /home/ubuntu/NewsFeed/NewsFeed.py >> /home/ubuntu/MailHandler/deetail.txt 2>&1"
+PUBLISH_NEWS="cd /home/ubuntu/NewsFeed; python ./NewsFeed.py >> /home/ubuntu/MailHandler/detail.txt 2>&1"
 
 def uploadNews(newNews):
     s3 = boto.connect_s3()
@@ -22,7 +22,9 @@ def uploadNews(newNews):
         oldNews = k.get_contents_as_string()
     else:
         oldNews = ""
-    news = oldNews + newNews    
+    print oldNews
+    news = oldNews + newNews 
+    print news   
     k.set_contents_from_string(news)
 
 parser = FeedParser()
@@ -31,6 +33,7 @@ for line in sys.stdin:
 message = parser.close()
 
 destination = message["X-Original-To"]
+print destination
 log = open(LOG_FILE, "a")
 if "auto.test.email@" in destination:
     log.write("Test email received at %s\n"%datetime.date.today())
@@ -38,6 +41,7 @@ elif "auto.submitted.run" in destination:
     log.write("Submitted run at %s\n"%datetime.date.today())
     os.system(PUBLISH)
     os.system(EVA_PUBLISH)
+    os.system(PUBLISH_NEWS)
 elif "auto.newsfeed" in destination:
     log.write("News item %s at %s\n"%(message["Subject"], datetime.date.today()))
     # !! Make score configurable in subject
