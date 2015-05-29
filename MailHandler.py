@@ -10,6 +10,7 @@ from boto.s3.key import Key
 LOG_FILE="/home/ubuntu/MailHandler/log.txt"
 PUBLISH="sh /home/ubuntu/Training/publish.sh > /home/ubuntu/MailHandler/detail.txt 2>&1"
 EVA_PUBLISH="sh /home/ubuntu/Training/eva_publish.sh >> /home/ubuntu/MailHandler/detail.txt 2>&1"
+PUBLISH_NEWS "python /home/ubuntu/NewsFeed/NewsFeed.py >> /home/ubuntu/MailHandler/deetail.txt 2>&1"
 
 def uploadNews(newNews):
     s3 = boto.connect_s3()
@@ -41,6 +42,7 @@ elif "auto.newsfeed" in destination:
     log.write("News item %s at %s\n"%(message["Subject"], datetime.date.today()))
     # !! Make score configurable in subject
     uploadNews("NEWS,%s,%s,%d\n"%(datetime.date.today(), message["Subject"], 50))
+    os.system(PUBLISH_NEWS)
 else:
     log.write("Unrecognized destination '%s' at %s\n"%(destination, datetime.date.today()))
 log.close()
