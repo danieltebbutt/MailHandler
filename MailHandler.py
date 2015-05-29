@@ -11,13 +11,16 @@ LOG_FILE="/home/ubuntu/MailHandler/log.txt"
 PUBLISH="sh /home/ubuntu/Training/publish.sh > /home/ubuntu/MailHandler/detail.txt 2>&1"
 EVA_PUBLISH="sh /home/ubuntu/Training/eva_publish.sh >> /home/ubuntu/MailHandler/detail.txt 2>&1"
 
-def upload(newNews):
+def uploadNews(newNews):
     s3 = boto.connect_s3()
     bucket = s3.get_bucket("danieltebbutt.com")
                     
     k = Key(bucket)
     k.key = "newsfeed/newslog.csv"
-    oldNews = k.get_contents_as_string()
+    if k.exists():
+        oldNews = k.get_contents_as_string()
+    else:
+        oldNews = ""
     news = oldNews + newNews    
     k.set_contents_from_string(news)
 
@@ -37,7 +40,7 @@ elif "auto.submitted.run" in destination:
 elif "auto.newsfeed" in destination:
     log.write("News item %s at %s\n"%(message["Subject"], datetime.date.today()))
     # !! Make score configurable in subject
-    upload("NEWS,%s,%s,%d\n"%(datetime.date.today(), message["Subject"], 50))
+    uploadNews("NEWS,%s,%s,%d\n"%(datetime.date.today(), message["Subject"], 50))
 else:
     log.write("Unrecognized destination '%s' at %s\n"%(destination, datetime.date.today()))
 log.close()
