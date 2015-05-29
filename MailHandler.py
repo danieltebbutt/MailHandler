@@ -27,6 +27,14 @@ def uploadNews(newNews):
     print news   
     k.set_contents_from_string(news)
 
+def upload(text, dest):
+    s3 = boto.connect_s3()
+    bucket = s3.get_bucket("danieltebbutt.com")
+
+    k = Key(bucket)
+    k.key = dest
+    k.set_contents_from_string(text)
+
 parser = FeedParser()
 for line in sys.stdin:
     parser.feed(line)
@@ -47,6 +55,8 @@ elif "auto.newsfeed" in destination:
     # !! Make score configurable in subject
     uploadNews("NEWS,%s,%s,%d\n"%(datetime.date.today(), message["Subject"], 50))
     os.system(PUBLISH_NEWS)
+elif "auto.test.upload" in destination:
+    upload(message["Subject"], "test.html")
 else:
     log.write("Unrecognized destination '%s' at %s\n"%(destination, datetime.date.today()))
 log.close()
