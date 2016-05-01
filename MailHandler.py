@@ -81,14 +81,17 @@ elif "auto.news.delete" in destination:
     deleteLast()
     publishNews()
 elif "auto.news" in destination:
-    log.write("News item %s at %s\n"%(message["Subject"], datetime.date.today()))
+    date = datetime.date.today()
+    log.write("News item %s at %s\n"%(message["Subject"], date))
     payload = message.get_payload()
     score = DEFAULT_SCORE
     for line in payload.strip().split("\n"):
         if "score" in line.lower():
             score = int(re.findall(r'\d+', line)[0])
+        if "date" in line.lower():
+            date = datetime.datetime.strptime(line, "date %Y-%m-%d").date()
 
-    uploadNews("NEWS,%s,%s,%d\n"%(datetime.date.today(), message["Subject"], score))
+    uploadNews("NEWS,%s,%s,%d\n"%(date, message["Subject"], score))
     publishNews()
 else:
     log.write("Unrecognized destination '%s' at %s\n"%(destination, datetime.date.today()))
